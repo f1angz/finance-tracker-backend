@@ -26,8 +26,7 @@ public class FinanceService {
 
     private static final DateTimeFormatter MONTH_FMT = DateTimeFormatter.ofPattern("MMM", new Locale("ru"));
 
-    public FinanceStatsDto getStats(UUID userId) {
-        YearMonth current = YearMonth.now();
+    public FinanceStatsDto getStats(UUID userId, YearMonth current) {
         YearMonth previous = current.minusMonths(1);
 
         BigDecimal curIncome  = sumForPeriod(userId, TransactionType.INCOME,  current);
@@ -46,8 +45,7 @@ public class FinanceService {
         );
     }
 
-    public List<CategoryExpenseDto> getCategoryExpenses(UUID userId) {
-        YearMonth current = YearMonth.now();
+    public List<CategoryExpenseDto> getCategoryExpenses(UUID userId, YearMonth current) {
         LocalDate from = current.atDay(1);
         LocalDate to   = current.atEndOfMonth();
 

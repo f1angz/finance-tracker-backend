@@ -2,8 +2,9 @@ package com.finance.tracker.dto.ai;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
-@Data @AllArgsConstructor
+@Data @NoArgsConstructor @AllArgsConstructor
 public class AiHealthScoreDto {
     private int overall;
     private int expenses;

@@ -9,6 +9,7 @@ import com.finance.tracker.repository.TransactionRepository;
 import com.finance.tracker.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -25,11 +26,14 @@ public class TransactionService {
 
     public List<TransactionDto> getTransactions(UUID userId, String type, String search, int page, int limit) {
         TransactionType typeEnum = (type != null && !type.isBlank()) ? TransactionType.valueOf(type) : null;
-        String searchParam = (search != null && !search.isBlank()) ? search : null;
+        String searchParam = (search != null && !search.isBlank()) ? search : "";
+        Pageable pageable = PageRequest.of(page - 1, limit);
 
-        return transactionRepository.findByUserIdFiltered(
-                userId, typeEnum, searchParam, PageRequest.of(page - 1, limit)
-        ).stream().map(this::toDto).toList();
+        var page_ = typeEnum != null
+                ? transactionRepository.findByUserIdAndTypeFiltered(userId, typeEnum, searchParam, pageable)
+                : transactionRepository.findByUserIdFiltered(userId, searchParam, pageable);
+
+        return page_.stream().map(this::toDto).toList();
     }
 
     @Transactional

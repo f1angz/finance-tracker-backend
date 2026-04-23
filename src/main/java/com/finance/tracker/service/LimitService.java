@@ -28,7 +28,7 @@ public class LimitService {
     private final TransactionRepository transactionRepository;
     private final UserRepository userRepository;
 
-    private static final DateTimeFormatter PERIOD_FMT = DateTimeFormatter.ofPattern("YYYY-MM");
+    private static final DateTimeFormatter PERIOD_FMT = DateTimeFormatter.ofPattern("yyyy-MM");
     private static final DateTimeFormatter DISPLAY_FMT = DateTimeFormatter.ofPattern("MMMM yyyy", new Locale("ru"));
 
     public List<LimitDto> getLimits(UUID userId, String period) {
