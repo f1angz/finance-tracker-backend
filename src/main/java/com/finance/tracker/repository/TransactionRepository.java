@@ -19,12 +19,25 @@ public interface TransactionRepository extends JpaRepository<Transaction, UUID> 
     @Query("""
         SELECT t FROM Transaction t
         WHERE t.user.id = :userId
-          AND (:type IS NULL OR t.type = :type)
-          AND (:search IS NULL OR LOWER(t.title) LIKE LOWER(CONCAT('%', :search, '%'))
+          AND (:search = '' OR LOWER(t.title) LIKE LOWER(CONCAT('%', :search, '%'))
                OR LOWER(t.description) LIKE LOWER(CONCAT('%', :search, '%')))
         ORDER BY t.date DESC, t.createdAt DESC
         """)
     Page<Transaction> findByUserIdFiltered(
+            @Param("userId") UUID userId,
+            @Param("search") String search,
+            Pageable pageable
+    );
+
+    @Query("""
+        SELECT t FROM Transaction t
+        WHERE t.user.id = :userId
+          AND t.type = :type
+          AND (:search = '' OR LOWER(t.title) LIKE LOWER(CONCAT('%', :search, '%'))
+               OR LOWER(t.description) LIKE LOWER(CONCAT('%', :search, '%')))
+        ORDER BY t.date DESC, t.createdAt DESC
+        """)
+    Page<Transaction> findByUserIdAndTypeFiltered(
             @Param("userId") UUID userId,
             @Param("type") TransactionType type,
             @Param("search") String search,
@@ -60,4 +73,6 @@ public interface TransactionRepository extends JpaRepository<Transaction, UUID> 
     );
 
     Optional<Transaction> findByIdAndUserId(UUID id, UUID userId);
+
+    List<Transaction> findAllByUserIdOrderByDateDescCreatedAtDesc(UUID userId);
 }
