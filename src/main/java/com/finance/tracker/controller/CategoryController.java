@@ -37,6 +37,12 @@ public class CategoryController {
         return categoryService.createCategory(securityUtils.currentUserId(), dto);
     }
 
+    @PutMapping("/{id}")
+    @Operation(summary = "Обновить категорию")
+    public CategoryDto updateCategory(@PathVariable String id, @Valid @RequestBody CategoryDto dto) {
+        return categoryService.updateCategory(securityUtils.currentUserId(), id, dto);
+    }
+
     @DeleteMapping("/{id}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     @Operation(summary = "Удалить категорию")
