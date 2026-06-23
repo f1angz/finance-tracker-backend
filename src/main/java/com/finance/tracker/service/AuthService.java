@@ -22,6 +22,7 @@ public class AuthService {
     private final PasswordEncoder passwordEncoder;
     private final JwtService jwtService;
     private final AuthenticationManager authenticationManager;
+    private final CategoryService categoryService;
 
     @Transactional
     public AuthResponse register(RegisterRequest request) {
@@ -39,6 +40,7 @@ public class AuthService {
                 .build();
 
         user = userRepository.save(user);
+        categoryService.createDefaultCategories(user);
         String token = jwtService.generateToken(user.getId(), user.getEmail());
         return toResponse(token, user);
     }

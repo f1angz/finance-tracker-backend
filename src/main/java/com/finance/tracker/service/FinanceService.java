@@ -4,6 +4,7 @@ import com.finance.tracker.dto.finance.CategoryExpenseDto;
 import com.finance.tracker.dto.finance.FinanceStatsDto;
 import com.finance.tracker.dto.finance.MonthlyStatsDto;
 import com.finance.tracker.entity.Transaction.TransactionType;
+import com.finance.tracker.repository.CategoryRepository;
 import com.finance.tracker.repository.TransactionRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -23,6 +24,7 @@ import java.util.UUID;
 public class FinanceService {
 
     private final TransactionRepository transactionRepository;
+    private final CategoryRepository categoryRepository;
 
     private static final DateTimeFormatter MONTH_FMT = DateTimeFormatter.ofPattern("MMM", new Locale("ru"));
 
@@ -60,7 +62,10 @@ public class FinanceService {
             BigDecimal amount = (BigDecimal) row[1];
             float pct = total.compareTo(BigDecimal.ZERO) == 0 ? 0f :
                     amount.divide(total, 4, RoundingMode.HALF_UP).floatValue() * 100f;
-            result.add(new CategoryExpenseDto(slug, amount, pct));
+            String categoryName = categoryRepository.findByUserIdAndSlug(userId, slug)
+                    .map(c -> c.getName())
+                    .orElse(slug);
+            result.add(new CategoryExpenseDto(slug, categoryName, amount, pct));
         }
         return result;
     }

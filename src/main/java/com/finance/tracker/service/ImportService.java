@@ -61,8 +61,6 @@ public class ImportService {
         if (raw.isEmpty()) return new ImportResultDto(0, 0);
 
         User user = userRepository.getReferenceById(userId);
-        ensureDefaultCategories(userId, user);
-
         List<Category> userCategories = categoryRepository.findByUserIdOrderByNameAsc(userId);
         Set<String> validSlugs = userCategories.stream().map(Category::getSlug).collect(Collectors.toSet());
 
@@ -199,22 +197,6 @@ public class ImportService {
         if (validSlugs.contains(slug)) return slug;
         log.warn("AI returned unknown slug '{}', falling back to default", slug);
         return "INCOME".equals(type) ? "transfer_in" : "other";
-    }
-
-    /** Создаёт все дефолтные категории для пользователя если их ещё нет */
-    private void ensureDefaultCategories(UUID userId, User user) {
-        for (Map.Entry<String, String[]> entry : CATEGORY_DEFS.entrySet()) {
-            String slug = entry.getKey();
-            if (!categoryRepository.existsByUserIdAndSlug(userId, slug)) {
-                String[] def = entry.getValue();
-                categoryRepository.save(Category.builder()
-                        .user(user)
-                        .slug(slug)
-                        .name(def[0])
-                        .type(Category.CategoryType.valueOf(def[1]))
-                        .build());
-            }
-        }
     }
 
     private Category getOrCreateCategory(UUID userId, User user, String slug, String type) {
